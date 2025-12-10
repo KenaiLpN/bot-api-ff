@@ -11,6 +11,8 @@ export const userResponseSchema = z.object({
   id_usuario: z.number().int().positive(),
   nome: z.string(),
   email: z.string(),
+  cpf: z.string(),
+  chk_ativo: z.boolean(),
 });
 
 export const listUsersResponseSchema = z.array(userResponseSchema);

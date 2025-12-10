@@ -5,6 +5,8 @@ export interface User {
   id_usuario: number;
   nome: string;
   email: string;
+  cpf: string;
+  chk_ativo: boolean;
 }
 
 export class UserService {
@@ -14,7 +16,7 @@ async createUser(data: CreateUserBody): Promise<User> {
     const { nome, email } = data;
 
     const sql = `
-      INSERT INTO "usuario" (nome, email)
+      INSERT INTO "usuario" (nome, email, cpf)
       VALUES ($1, $2)
       RETURNING id_usuario, nome, email;
     `;
@@ -27,6 +29,8 @@ async createUser(data: CreateUserBody): Promise<User> {
         id_usuario: Number(result.rows[0].id_usuario),
         nome: result.rows[0].nome,
         email: result.rows[0].email,
+        cpf: result.rows[0].cpf,
+        chk_ativo: result.rows[0].chk_ativo,
       };
 
       return createdUser;
@@ -42,8 +46,8 @@ async createUser(data: CreateUserBody): Promise<User> {
 
 async getAllUsers(): Promise<User[]> {
   const sql = `
-    SELECT id_usuario, nome, email
-    FROM "usuario";
+    SELECT id_usuario, nome, email, cpf, chk_ativo, * FROM usuario
+    ORDER by id_usuario;
   `;
 
   try {
