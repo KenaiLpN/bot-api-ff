@@ -13,14 +13,14 @@ export class UserService {
 
 
 async createUser(data: CreateUserBody): Promise<User> {
-    const { nome, email } = data;
+    const { nome, email, cpf } = data;
 
     const sql = `
       INSERT INTO "usuario" (nome, email, cpf)
-      VALUES ($1, $2)
-      RETURNING id_usuario, nome, email;
+      VALUES ($1, $2, $3)
+      RETURNING *;
     `;
-    const params = [nome, email];
+    const params = [nome, email, cpf];
 
     try {
       const result = await query(sql, params);

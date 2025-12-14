@@ -30,10 +30,10 @@ export async function userRoutes(app: FastifyInstance) {
     },
 
     async (request, reply: FastifyReply) => {
-      const { nome, email } = request.body as CreateUserBody;
+      const { nome, email, cpf } = request.body as CreateUserBody;
 
       try {
-        const newUser = await userService.createUser({ nome, email });
+        const newUser = await userService.createUser({ nome, email, cpf });
 
         return reply.status(201).send(newUser);
       } catch (error) {

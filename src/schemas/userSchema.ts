@@ -3,6 +3,7 @@ import { z } from "zod";
 export const createUserBodySchema = z.object({
   nome: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
   email: z.string().email("Formato de e-mail inválido."),
+  cpf: z.string()
 });
 
 export type CreateUserBody = z.infer<typeof createUserBodySchema>;
