@@ -6,9 +6,13 @@ import {
   userResponseSchema,
   listUsersResponseSchema,
   CreateUserBody,
+  listUsersQuerySchema,
+  ListUsersQuery
 } from "../schemas/userSchema";
 import { z } from "zod";
 import { FastifyReply } from "fastify";
+
+
 
 const userService = new UserService();
 
@@ -50,32 +54,32 @@ export async function userRoutes(app: FastifyInstance) {
     }
   );
 
-  app.withTypeProvider<ZodTypeProvider>().get(
+app.withTypeProvider<ZodTypeProvider>().get(
     "/users",
     {
       schema: {
         tags: ["Usuários"],
-        summary: "Lista todos os usuários (clientes) cadastrados no sistema",
+        summary: "Lista usuários com paginação",
+        querystring: listUsersQuerySchema, // Adicione validação da Query String
         response: {
-          200: listUsersResponseSchema,
+          200: listUsersResponseSchema, // Atualize para o novo formato de resposta
           500: z.object({ message: z.string() }),
         },
       },
     },
     async (request, reply: FastifyReply) => {
+      const { page, limit } = request.query as ListUsersQuery;
+
       try {
-        const users = await userService.getAllUsers();
-        return reply.status(200).send(users);
+        const result = await userService.getAllUsers(page, limit);
+        return reply.status(200).send(result);
       } catch (error) {
+        // ... (mantenha o tratamento de erro igual)
         if (error instanceof Error) {
-          console.error(error.message);
-          return reply.status(500).send({
-            message: "Erro interno ao processar a requisição.",
-          });
+           console.error(error.message);
+           return reply.status(500).send({ message: "Erro interno." });
         }
-        return reply.status(500).send({
-          message: "Um erro desconhecido ocorreu.",
-        });
+        return reply.status(500).send({ message: "Erro desconhecido." });
       }
     }
   );

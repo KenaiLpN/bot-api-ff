@@ -9,6 +9,16 @@ export interface User {
   chk_ativo: boolean;
 }
 
+export interface PaginatedResult<T> {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export class UserService {
 
 
@@ -44,22 +54,46 @@ async createUser(data: CreateUserBody): Promise<User> {
 
 
 
-async getAllUsers(): Promise<User[]> {
-  const sql = `
-    SELECT id_usuario, nome, email, cpf, chk_ativo, * FROM usuario
-    ORDER by id_usuario;
-  `;
+async getAllUsers(page: number, limit: number): Promise<PaginatedResult<User>> {
+  const offset = (page - 1) * limit;
+
+
+  const sqlData = `
+      SELECT id_usuario, nome, email, cpf, chk_ativo 
+      FROM usuario
+      ORDER by id_usuario
+      LIMIT $1 OFFSET $2;
+    `;
+
+    const sqlCount = `SELECT COUNT(*) as total FROM usuario;`;
+
 
   try {
-    const result = await query(sql);
-    return result.rows;
-  } catch (error) {
-    console.error("Erro ao buscar usuários no DB:", error);
-    throw new Error("Falha ao buscar usuários no banco de dados.");
+      // Executa as duas queries
+      const resultData = await query(sqlData, [limit, offset]);
+      const resultCount = await query(sqlCount);
+
+      const total = Number(resultCount.rows[0].total);
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: resultData.rows,
+        meta: {
+          page,
+          limit,
+          total,
+          totalPages
+        }
+      };
+
+    } catch (error) {
+      console.error("Erro ao buscar usuários no DB:", error);
+      throw new Error("Falha ao buscar usuários no banco de dados.");
+    }
   }
 }
 
-}
+
 
 // async getUserById(id_usuario: number): Promise<User[]> {
 //   const sql = `
