@@ -1,11 +1,25 @@
 import { z } from "zod";
 
-// ... (mantenha o createUserBodySchema e CreateUserBody como estão) ...
+
+export const loginBodySchema = z.object({
+  email: z.string().email("E-mail inválido"),
+  senha: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+});
+
+export type LoginBody = z.infer<typeof loginBodySchema>;
 
 export const createUserBodySchema = z.object({
   nome: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
   email: z.string().email("Formato de e-mail inválido."),
-  cpf: z.string()
+  cpf: z.string(),
+  endereco: z.string().optional().nullable(),
+  estado: z.string().optional().nullable(),
+  cidade: z.string().optional().nullable(),
+  bairro: z.string().optional().nullable(),
+  cep: z.string().optional().nullable(),
+  telefone: z.string().optional().nullable(),
+  senha_hash: z.string().min(8, "A senha deve ter pelo menos 8 caracteres."),
+
 });
 
 export type CreateUserBody = z.infer<typeof createUserBodySchema>;
@@ -18,7 +32,7 @@ export const userResponseSchema = z.object({
   chk_ativo: z.boolean(),
 });
 
-// NOVO: Schema para os parâmetros de busca (Query String)
+
 export const listUsersQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
@@ -26,7 +40,7 @@ export const listUsersQuerySchema = z.object({
 
 export type ListUsersQuery = z.infer<typeof listUsersQuerySchema>;
 
-// ATUALIZADO: Resposta agora contém os dados E o total de registros
+
 export const listUsersResponseSchema = z.object({
   data: z.array(userResponseSchema),
   meta: z.object({
