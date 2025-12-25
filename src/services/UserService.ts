@@ -65,7 +65,7 @@ export class UserService {
     const sql = `
       INSERT INTO "usuario" (
         nome, email, cpf, endereco, estado, 
-        cidade, bairro, cep, telefone, passwordHash
+        cidade, bairro, cep, telefone, senha_hash
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *;
